@@ -67,7 +67,14 @@ module.exports = async function (fastify, opts) {
           table: "users",
           searchAttribute: "email",
           searchValue: email,
-          attributes: ["email", "firstname", "lastname", "password", "role"],
+          attributes: [
+            "email",
+            "firstname",
+            "lastname",
+            "password",
+            "role",
+            "budget",
+          ],
         });
         const existingUser = userResponse.data.shift();
 
