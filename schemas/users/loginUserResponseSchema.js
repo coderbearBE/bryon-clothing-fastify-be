@@ -6,5 +6,6 @@ module.exports = {
     firstname: { type: "string" },
     lastname: { type: "string" },
     role: { type: "string", enum: ["MEMBER", "STAFF", "ADMIN"] },
+    budget: { type: "number" },
   },
 };
