@@ -5,6 +5,7 @@ module.exports = {
     email: { type: "string", format: "email" },
     firstname: { type: "string" },
     lastname: { type: "string" },
+    gender: { type: "string", enum: ["MALE", "FEMALE"] },
     budget: { type: "number" },
     password: { type: "string" },
     role: { type: "string", enum: ["MEMBER", "STAFF", "ADMIN"] },

@@ -1,9 +1,11 @@
 const argon2 = require("argon2");
+const { PrismaClient } = require("@prisma/client");
 const R = require("ramda");
-const client = require("../../config/dbclient");
 const loginUserSchema = require("../../schemas/users/loginUserSchema");
 const loginUserResponseSchema = require("../../schemas/users/loginUserResponseSchema");
 const registerUserSchema = require("../../schemas/users/registerUserSchema");
+
+const prisma = new PrismaClient();
 
 module.exports = async function (fastify, opts) {
   // POST register user
@@ -18,27 +20,19 @@ module.exports = async function (fastify, opts) {
       const { email, password } = request.body;
 
       try {
-        const userResponse = await client.searchByValue({
-          table: "users",
-          searchAttribute: "email",
-          searchValue: email,
-          attributes: ["email", "firstname", "lastname"],
+        const existingUser = await prisma.user.findFirst({
+          where: { email },
         });
-        const existingUser = userResponse.data.shift();
 
         if (!R.isNil(existingUser))
           return fastify.httpErrors.badRequest("User already exists");
-
         const hashedPwd = await argon2.hash(password);
 
-        const newUser = {
-          ...request.body,
-          password: hashedPwd,
-        };
-
-        await client.insert({
-          table: "users",
-          records: [newUser],
+        await prisma.user.create({
+          data: {
+            ...request.body,
+            password: hashedPwd,
+          },
         });
 
         reply.code(201).send(`User created with email ${email}`);
@@ -63,20 +57,9 @@ module.exports = async function (fastify, opts) {
       const { email, password } = request.body;
 
       try {
-        const userResponse = await client.searchByValue({
-          table: "users",
-          searchAttribute: "email",
-          searchValue: email,
-          attributes: [
-            "email",
-            "firstname",
-            "lastname",
-            "password",
-            "role",
-            "budget",
-          ],
+        const existingUser = await prisma.user.findFirst({
+          where: { email },
         });
-        const existingUser = userResponse.data.shift();
 
         const isValidPassword = await argon2.verify(
           existingUser.password,
