@@ -1,15 +1,13 @@
-const client = require("../../config/dbclient");
 const createProductSchema = require("../../schemas/products/createProductSchema");
 
 module.exports = async function (fastify, opts) {
   //GET products
   fastify.get("/", async (request, reply) => {
     try {
-      const allProductsResponse = await client.query(
-        "SELECT * FROM bryonclothing.products"
-      );
-
-      reply.code(200).send(allProductsResponse.data);
+      // const allProductsResponse = await client.query(
+      //   "SELECT * FROM bryonclothing.products"
+      // );
+      // reply.code(200).send(allProductsResponse.data);
     } catch (error) {
       console.error(error);
       return fastify.httpErrors.notFound();
@@ -36,12 +34,11 @@ module.exports = async function (fastify, opts) {
         );
 
       try {
-        const insertProductResponse = await client.insert({
-          table: "products",
-          records: [request.body],
-        });
-
-        reply.code(201).send(insertProductResponse.data);
+        // const insertProductResponse = await client.insert({
+        //   table: "products",
+        //   records: [request.body],
+        // });
+        // reply.code(201).send(insertProductResponse.data);
       } catch (error) {
         console.error(error);
         return fastify.httpErrors.badRequest("Failed to insert new product");
