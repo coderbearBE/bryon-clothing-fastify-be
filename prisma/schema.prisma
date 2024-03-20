@@ -15,10 +15,10 @@ model User {
   firstname String
   lastname String
   gender Gender
-  email String
+  email String @unique
   password String
   role Role
-  budget Int
+  budget Float
 }
 
 enum Gender {
@@ -34,20 +34,22 @@ enum Role {
 
 model Product {
   id String @id @default(auto()) @map("_id") @db.ObjectId
+  descriptionDoltcini String @unique
+  descriptionBryon String
+  clothingType ClothingType
+  retailFor Gender
+  price Float
+}
+
+enum ClothingType {
+  ACCESSORY
+  FOOTWEAR
+  TEXTILE
 }
 
 model Order {
   id String @id @default(auto()) @map("_id") @db.ObjectId
   owner Owner
-}
-
-enum Size {
-  XS
-  S
-  M
-  L
-  XL
-  XXL
 }
 
 type Owner {

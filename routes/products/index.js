@@ -1,4 +1,8 @@
+const { PrismaClient } = require("@prisma/client");
+const R = require("ramda");
 const createProductSchema = require("../../schemas/products/createProductSchema");
+
+const prisma = new PrismaClient();
 
 module.exports = async function (fastify, opts) {
   //GET products
@@ -33,12 +37,21 @@ module.exports = async function (fastify, opts) {
           "You are not allowed to perform this action"
         );
 
+      const { descriptionDoltcini } = request.body;
+
       try {
-        // const insertProductResponse = await client.insert({
-        //   table: "products",
-        //   records: [request.body],
-        // });
-        // reply.code(201).send(insertProductResponse.data);
+        const existingProduct = await prisma.product.findFirst({
+          where: { descriptionDoltcini },
+        });
+
+        if (!R.isNil(existingProduct))
+          return fastify.httpErrors.badRequest("Product already exists");
+
+        const createdProduct = await prisma.product.create({
+          data: { ...request.body },
+        });
+
+        reply.code(201).send(createdProduct);
       } catch (error) {
         console.error(error);
         return fastify.httpErrors.badRequest("Failed to insert new product");

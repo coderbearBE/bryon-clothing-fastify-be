@@ -1,10 +1,20 @@
 module.exports = {
   type: "object",
-  required: ["description_doltcini", "description_bryon", "price"],
+  required: [
+    "descriptionDoltcini",
+    "descriptionBryon",
+    "clothingType",
+    "retailFor",
+    "price",
+  ],
   properties: {
-    description_doltcini: { type: "string" },
-    description_bryon: { type: "string" },
+    descriptionDoltcini: { type: "string" },
+    descriptionBryon: { type: "string" },
+    clothingType: {
+      type: "string",
+      enum: ["ACCESSORY", "FOOTWEAR", "TEXTILE"],
+    },
+    retailFor: { type: "string", enum: ["MALE", "FEMALE"] },
     price: { type: "number", minimum: 0 },
-    additional_info: { type: "string" },
   },
 };
