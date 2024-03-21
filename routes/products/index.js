@@ -8,10 +8,9 @@ module.exports = async function (fastify, opts) {
   //GET products
   fastify.get("/", async (request, reply) => {
     try {
-      // const allProductsResponse = await client.query(
-      //   "SELECT * FROM bryonclothing.products"
-      // );
-      // reply.code(200).send(allProductsResponse.data);
+      const allProductsResponse = await prisma.product.findMany();
+
+      reply.code(200).send(allProductsResponse);
     } catch (error) {
       console.error(error);
       return fastify.httpErrors.notFound();
@@ -37,11 +36,11 @@ module.exports = async function (fastify, opts) {
           "You are not allowed to perform this action"
         );
 
-      const { descriptionDoltcini } = request.body;
+      const { productCode } = request.body;
 
       try {
         const existingProduct = await prisma.product.findFirst({
-          where: { descriptionDoltcini },
+          where: { productCode },
         });
 
         if (!R.isNil(existingProduct))

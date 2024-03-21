@@ -1,14 +1,8 @@
 module.exports = {
   type: "object",
-  required: [
-    "descriptionDoltcini",
-    "descriptionBryon",
-    "clothingType",
-    "retailFor",
-    "price",
-  ],
+  required: ["productCode", "descriptionBryon", "clothingType", "price"],
   properties: {
-    descriptionDoltcini: { type: "string" },
+    productCode: { type: "string" },
     descriptionBryon: { type: "string" },
     clothingType: {
       type: "string",

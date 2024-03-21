@@ -34,10 +34,10 @@ enum Role {
 
 model Product {
   id String @id @default(auto()) @map("_id") @db.ObjectId
-  descriptionDoltcini String @unique
+  productCode String @unique
   descriptionBryon String
   clothingType ClothingType
-  retailFor Gender
+  retailFor Gender?
   price Float
 }
 
