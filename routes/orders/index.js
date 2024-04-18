@@ -85,4 +85,6 @@ module.exports = async function (fastify, opts) {
       }
     }
   );
+
+  // PUT or PATCH order
 };

@@ -6,7 +6,7 @@ module.exports = {
     descriptionBryon: { type: "string" },
     clothingType: {
       type: "string",
-      enum: ["ACCESSORY", "FOOTWEAR", "TEXTILE"],
+      enum: ["ACCESSORY", "FOOTWEAR", "TEXTILE", "UNDERWEAR"],
     },
     retailFor: { type: "string", enum: ["MALE", "FEMALE"] },
     price: { type: "number", minimum: 0 },
