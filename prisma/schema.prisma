@@ -52,6 +52,8 @@ model Order {
   id String @id @default(auto()) @map("_id") @db.ObjectId
   owner Owner
   year Int
+  products OrderProduct[]
+  restAmount Float
 }
 
 type Owner {

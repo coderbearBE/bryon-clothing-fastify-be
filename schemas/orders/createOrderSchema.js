@@ -1,6 +1,6 @@
 module.exports = {
   type: "object",
-  required: ["owner", "year", "products"],
+  required: ["owner", "year", "products", "restAmount"],
   properties: {
     owner: {
       type: "object",
@@ -37,5 +37,6 @@ module.exports = {
         },
       },
     },
+    restAmount: { type: "number" },
   },
 };
