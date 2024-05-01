@@ -1,5 +1,9 @@
+const { PrismaClient } = require("@prisma/client");
+const R = require("ramda");
 const createOrderSchema = require("../../schemas/orders/createOrderSchema");
 const getOrderTotalsResponseSchema = require("../../schemas/orders/getOrderTotalsResponseSchema");
+
+const prisma = new PrismaClient();
 
 module.exports = async function (fastify, opts) {
   // GET all orders
@@ -73,12 +77,22 @@ module.exports = async function (fastify, opts) {
       },
     },
     async (request, reply) => {
+      const { owner, year } = request.body;
+
       try {
-        // const insertOrderResponse = await client.insert({
-        //   table: "orders",
-        //   records: [request.body],
-        // });
-        // reply.code(201).send(insertOrderResponse.data);
+        const existingOrderForCurrentYear = await prisma.order.findFirst({
+          where: { owner, year },
+        });
+        if (!R.isNil(existingOrderForCurrentYear))
+          return fastify.httpErrors.badRequest(
+            "Already placed an order for this year"
+          );
+
+        const createdOrder = await prisma.order.create({
+          data: { ...request.body },
+        });
+
+        reply.code(201).send(createdOrder);
       } catch (error) {
         console.error(error);
         return fastify.httpErrors.badRequest("Failed to insert new order");

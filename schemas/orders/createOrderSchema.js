@@ -1,14 +1,15 @@
 module.exports = {
   type: "object",
-  required: ["owner", "year", "products", "restAmount"],
+  required: ["owner", "year", "products", "totalAmount", "restAmount"],
   properties: {
     owner: {
       type: "object",
-      required: ["firstname", "lastname", "email"],
+      required: ["firstname", "lastname", "email", "budget"],
       properties: {
         email: { type: "string", format: "email" },
         firstname: { type: "string" },
         lastname: { type: "string" },
+        budget: { type: "number" },
       },
     },
     year: { type: "number" },
@@ -37,6 +38,7 @@ module.exports = {
         },
       },
     },
+    totalAmount: { type: "number" },
     restAmount: { type: "number" },
   },
 };

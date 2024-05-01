@@ -53,16 +53,19 @@ model Order {
   owner Owner
   year Int
   products OrderProduct[]
+  totalAmount Float
   restAmount Float
 }
 
 type Owner {
-  firstName String
-  lastName String
+  firstname String
+  lastname String
   email String
+  budget Float
 }
 
 type OrderProduct {
+  id String
   productCode String
   descriptionBryon String
   clothingType ClothingType
