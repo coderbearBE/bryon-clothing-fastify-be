@@ -1,11 +1,36 @@
 const { PrismaClient } = require("@prisma/client");
 const R = require("ramda");
 const createOrderSchema = require("../../schemas/orders/createOrderSchema");
+const getCurrentOrderSchema = require("../../schemas/orders/getCurrentOrderSchema");
 const getOrderTotalsResponseSchema = require("../../schemas/orders/getOrderTotalsResponseSchema");
 
 const prisma = new PrismaClient();
 
 module.exports = async function (fastify, opts) {
+  // GET single order
+  fastify.post(
+    "/current",
+    {
+      onRequest: [fastify.authenticate],
+      schema: { body: getCurrentOrderSchema },
+    },
+    async (request, reply) => {
+      const { owner } = request.body;
+
+      try {
+        const currentOrder =
+          (await prisma.order.findFirst({
+            where: { owner, year: new Date().getFullYear() },
+          })) ?? {};
+
+        reply.code(200).send(currentOrder);
+      } catch (error) {
+        console.error(error);
+        return fastify.httpErrors.badRequest("Server failure");
+      }
+    }
+  );
+
   // GET all orders
   fastify.get(
     "/",
@@ -83,6 +108,7 @@ module.exports = async function (fastify, opts) {
         const existingOrderForCurrentYear = await prisma.order.findFirst({
           where: { owner, year },
         });
+
         if (!R.isNil(existingOrderForCurrentYear))
           return fastify.httpErrors.badRequest(
             "Already placed an order for this year"
