@@ -2,7 +2,6 @@ const { PrismaClient } = require("@prisma/client");
 const R = require("ramda");
 const createOrderSchema = require("../../schemas/orders/createOrderSchema");
 const getCurrentOrderSchema = require("../../schemas/orders/getCurrentOrderSchema");
-const getOrderTotalsResponseSchema = require("../../schemas/orders/getOrderTotalsResponseSchema");
 
 const prisma = new PrismaClient();
 
@@ -33,7 +32,7 @@ module.exports = async function (fastify, opts) {
 
   // GET all orders
   fastify.get(
-    "/",
+    "/all",
     {
       onRequest: [fastify.authenticate],
     },
@@ -48,10 +47,11 @@ module.exports = async function (fastify, opts) {
         );
 
       try {
-        // const allOrdersResponse = await client.query(
-        //   `SELECT * FROM bryonclothing.orders WHERE year=${new Date().getFullYear()}`
-        // );
-        // reply.code(200).send(allOrdersResponse.data);
+        const allOrdersForCurrentYear = await prisma.order.findMany({
+          where: { year: new Date().getFullYear() },
+        });
+
+        reply.code(200).send(allOrdersForCurrentYear);
       } catch (error) {
         console.error(error);
         return fastify.httpErrors.notFound();
@@ -64,11 +64,6 @@ module.exports = async function (fastify, opts) {
     "/totals",
     {
       onRequest: [fastify.authenticate],
-      schema: {
-        response: {
-          200: getOrderTotalsResponseSchema,
-        },
-      },
     },
     async (request, reply) => {
       const { role } = fastify.jwt.decode(
@@ -81,10 +76,38 @@ module.exports = async function (fastify, opts) {
         );
 
       try {
-        // const getTotalsResponse = await client.query(
-        //   "SELECT * FROM bryoncycling.orders"
-        // );
-        // reply.code(200).send(getTotalsResponse.data);
+        const allOrdersForCurrentYear = await prisma.order.findMany({
+          where: { year: new Date().getFullYear() },
+        });
+
+        let orderTotals = {};
+        for (const order of allOrdersForCurrentYear) {
+          for (const product of order.products) {
+            const { productCode, size, quantity } = product;
+
+            if (!orderTotals.hasOwnProperty(productCode)) {
+              orderTotals[productCode] = [{ size, quantity }];
+            } else {
+              if (
+                !orderTotals[productCode].some((item) => item.size === size)
+              ) {
+                orderTotals[productCode] = [
+                  ...orderTotals[productCode],
+                  { size, quantity },
+                ];
+              } else {
+                orderTotals[productCode] = orderTotals[productCode].map(
+                  (item) =>
+                    item.size === size
+                      ? { ...item, quantity: item.quantity + quantity }
+                      : item
+                );
+              }
+            }
+          }
+        }
+
+        reply.code(200).send(orderTotals);
       } catch (error) {
         console.error(error);
         return fastify.httpErrors.notFound();
