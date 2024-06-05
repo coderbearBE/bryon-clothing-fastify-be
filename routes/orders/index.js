@@ -83,24 +83,27 @@ module.exports = async function (fastify, opts) {
         let orderTotals = {};
         for (const order of allOrdersForCurrentYear) {
           for (const product of order.products) {
-            const { productCode, size, quantity } = product;
+            const { productCode, price, size, quantity } = product;
 
             if (!orderTotals.hasOwnProperty(productCode)) {
-              orderTotals[productCode] = [{ size, quantity }];
+              orderTotals[productCode] = { price, order: [{ size, quantity }] };
             } else {
               if (
-                !orderTotals[productCode].some((item) => item.size === size)
+                !orderTotals[productCode].order.some(
+                  (item) => item.size === size
+                )
               ) {
-                orderTotals[productCode] = [
-                  ...orderTotals[productCode],
+                orderTotals[productCode].order = [
+                  ...orderTotals[productCode].order,
                   { size, quantity },
                 ];
               } else {
-                orderTotals[productCode] = orderTotals[productCode].map(
-                  (item) =>
-                    item.size === size
-                      ? { ...item, quantity: item.quantity + quantity }
-                      : item
+                orderTotals[productCode].order = orderTotals[
+                  productCode
+                ].order.map((item) =>
+                  item.size === size
+                    ? { ...item, quantity: item.quantity + quantity }
+                    : item
                 );
               }
             }
