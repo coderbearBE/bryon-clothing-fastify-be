@@ -80,27 +80,28 @@ module.exports = async function (fastify, opts) {
           where: { year: new Date().getFullYear() },
         });
 
-        let orderTotals = {};
-        for (const order of allOrdersForCurrentYear) {
-          for (const product of order.products) {
+        let totals = [];
+        for (const { products } of allOrdersForCurrentYear) {
+          for (const product of products) {
             const { productCode, price, size, quantity } = product;
 
-            if (!orderTotals.hasOwnProperty(productCode)) {
-              orderTotals[productCode] = { price, order: [{ size, quantity }] };
+            if (
+              totals.length === 0 ||
+              totals.every((item) => item.productCode !== productCode)
+            ) {
+              totals = [
+                ...totals,
+                { productCode, price, ordered: [{ size, quantity }] },
+              ];
             } else {
-              if (
-                !orderTotals[productCode].order.some(
-                  (item) => item.size === size
-                )
-              ) {
-                orderTotals[productCode].order = [
-                  ...orderTotals[productCode].order,
-                  { size, quantity },
-                ];
+              const entry = totals.find(
+                (item) => item.productCode === productCode
+              );
+
+              if (entry.ordered.every((item) => item.size !== size)) {
+                entry.ordered = [...entry.ordered, { size, quantity }];
               } else {
-                orderTotals[productCode].order = orderTotals[
-                  productCode
-                ].order.map((item) =>
+                entry.ordered = entry.ordered.map((item) =>
                   item.size === size
                     ? { ...item, quantity: item.quantity + quantity }
                     : item
@@ -110,7 +111,7 @@ module.exports = async function (fastify, opts) {
           }
         }
 
-        reply.code(200).send(orderTotals);
+        reply.code(200).send(totals);
       } catch (error) {
         console.error(error);
         return fastify.httpErrors.notFound();
