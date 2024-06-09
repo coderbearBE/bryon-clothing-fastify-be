@@ -1,15 +1,16 @@
-const client = require("../../config/dbclient");
+const { PrismaClient } = require("@prisma/client");
+const R = require("ramda");
 const createProductSchema = require("../../schemas/products/createProductSchema");
+
+const prisma = new PrismaClient();
 
 module.exports = async function (fastify, opts) {
   //GET products
   fastify.get("/", async (request, reply) => {
     try {
-      const allProductsResponse = await client.query(
-        "SELECT * FROM bryonclothing.products"
-      );
+      const allProductsResponse = await prisma.product.findMany();
 
-      reply.code(200).send(allProductsResponse.data);
+      reply.code(200).send(allProductsResponse);
     } catch (error) {
       console.error(error);
       return fastify.httpErrors.notFound();
@@ -35,13 +36,21 @@ module.exports = async function (fastify, opts) {
           "You are not allowed to perform this action"
         );
 
+      const { productCode } = request.body;
+
       try {
-        const insertProductResponse = await client.insert({
-          table: "products",
-          records: [request.body],
+        const existingProduct = await prisma.product.findFirst({
+          where: { productCode },
         });
 
-        reply.code(201).send(insertProductResponse.data);
+        if (!R.isNil(existingProduct))
+          return fastify.httpErrors.badRequest("Product already exists");
+
+        const createdProduct = await prisma.product.create({
+          data: { ...request.body },
+        });
+
+        reply.code(201).send(createdProduct);
       } catch (error) {
         console.error(error);
         return fastify.httpErrors.badRequest("Failed to insert new product");

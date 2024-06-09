@@ -1,0 +1,77 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  firstname String
+  lastname String
+  gender Gender
+  email String @unique
+  password String
+  role Role
+  budget Float
+}
+
+enum Gender {
+  DEFAULT
+  MALE
+  FEMALE
+}
+
+enum Role {
+  MEMBER
+  STAFF
+  ADMIN
+}
+
+model Product {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  productCode String @unique
+  descriptionBryon String
+  clothingType ClothingType
+  retailFor Gender?
+  price Float
+}
+
+enum ClothingType {
+  ACCESSORY
+  FOOTWEAR
+  TEXTILE
+  UNDERWEAR
+}
+
+model Order {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  owner Owner
+  year Int
+  products OrderProduct[]
+  totalAmount Float
+  restAmount Float
+}
+
+type Owner {
+  firstname String
+  lastname String
+  email String
+  budget Float
+}
+
+type OrderProduct {
+  id String
+  productCode String
+  descriptionBryon String
+  clothingType ClothingType
+  retailFor Gender?
+  price Float
+  size String
+  quantity Int
+}
