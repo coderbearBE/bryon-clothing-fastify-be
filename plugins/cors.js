@@ -15,6 +15,7 @@ module.exports = fp(async function (fastify, opts) {
   });
 
   fastify.addHook("onSend", function (req, reply, payload, done) {
+    req.header("Access-Control-Allow-Origin", "*");
     reply.header("Access-Control-Allow-Origin", "*");
 
     done(null, payload);
