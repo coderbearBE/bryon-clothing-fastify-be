@@ -1,25 +1,26 @@
-"use strict";
+'use strict';
 
-const path = require("path");
-const AutoLoad = require("@fastify/autoload");
+const Fastify = require('fastify');
+const app = require('./app.js'); // your plugin loader
+require('dotenv').config();
 
-module.exports = async function (fastify, opts) {
-  // Place here your custom code!
-
-  // Do not touch the following lines
-
-  // This loads all plugins defined in plugins
-  // those should be support plugins that are reused
-  // through your application
-  fastify.register(AutoLoad, {
-    dir: path.join(__dirname, "plugins"),
-    options: Object.assign({}, opts),
+const start = async () => {
+  const fastify = Fastify({
+    logger: true,
   });
 
-  // This loads all plugins defined in routes
-  // define your routes in one of these
-  fastify.register(AutoLoad, {
-    dir: path.join(__dirname, "routes"),
-    options: Object.assign({ prefix: "api" }, opts),
-  });
+  // Register the app plugin
+  await fastify.register(app);
+
+  const port = process.env.PORT || 3000; // Render will inject PORT env var
+
+  try {
+    await fastify.listen({ port, host: '0.0.0.0' }); // ✅ REQUIRED for Render
+    console.log(`Server running on http://0.0.0.0:${port}`);
+  } catch (err) {
+    fastify.log.error(err);
+    process.exit(1);
+  }
 };
+
+start();

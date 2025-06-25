@@ -8,10 +8,10 @@
   },
   "scripts": {
     "test": "tap \"test/**/*.test.js\"",
-    "start:fastify": "fastify start -l info app.js",
-    "start": "node server.js",
-    "dev:fastify": "fastify start -w -l info -P app.js",
-    "dev": "node server.js"
+    "start:fastify": "fastify start -l info fastify.js",
+    "start": "node app.js",
+    "dev:fastify": "fastify start -w -l info -P fastify.js",
+    "dev": "node app.js"
   },
   "keywords": [],
   "author": "",
