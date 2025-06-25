@@ -2,16 +2,16 @@
   "name": "bryon-clothing-fastify-be",
   "version": "1.0.0",
   "description": "This project was bootstrapped with Fastify-CLI.",
-  "main": "app.js",
+  "main": "server.js",
   "directories": {
     "test": "test"
   },
   "scripts": {
     "test": "tap \"test/**/*.test.js\"",
-    "start:fastify": "fastify start -l info fastify.js",
-    "start": "node app.js",
-    "dev:fastify": "fastify start -w -l info -P fastify.js",
-    "dev": "node app.js"
+    "start:fastify": "fastify start -l info app.js",
+    "start": "node server.js",
+    "dev:fastify": "fastify start -w -l info -P app.js",
+    "dev": "node server.js"
   },
   "keywords": [],
   "author": "",
