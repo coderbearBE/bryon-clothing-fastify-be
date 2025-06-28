@@ -58,7 +58,12 @@ module.exports = async function (fastify, opts) {
 
       try {
         const existingUser = await prisma.user.findFirst({
-          where: { email },
+          where: {
+            email: {
+              equals: email,
+              mode: 'insensitive'
+            }
+          },
         });
 
         const isValidPassword = await argon2.verify(
